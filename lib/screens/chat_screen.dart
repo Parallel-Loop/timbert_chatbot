@@ -22,26 +22,27 @@ class _ChatScreenState extends State<ChatScreen> {
     controller.clear();
     try {
       if (text.isNotEmpty) {
+        //dont use setsate
         setState(() {
           msgs.insert(0, Message(true, text));
           isTyping = true;
         });
         scrollController.animateTo(0.0,
             duration: const Duration(seconds: 1), curve: Curves.easeOut);
-        var response = await http.post(
-            Uri.parse("https://chatgpt-api8.p.rapidapi.com/"),
-            headers: {
-              'Content-Type': 'application/json',
-              'X-Rapidapi-Key':
-              '424084936fmshfdd1700b22769e3p10eccejsn0b9eb34547d4',
-              'X-Rapidapi-Host': 'chatgpt-api8.p.rapidapi.com',
-            },
-            body: jsonEncode({
-              "model": "gpt-3.5-turbo",
-              "messages": [
-                {"role": "user", "content": text}
-              ]
-            }));
+        var response =
+            await http.post(Uri.parse("https://chatgpt-api8.p.rapidapi.com/"),
+                headers: {
+                  'Content-Type': 'application/json',
+                  'X-Rapidapi-Key':
+                      '424084936fmshfdd1700b22769e3p10eccejsn0b9eb34547d4',
+                  'X-Rapidapi-Host': 'chatgpt-api8.p.rapidapi.com',
+                },
+                body: jsonEncode({
+                  "model": "gpt-3.5-turbo",
+                  "messages": [
+                    {"role": "user", "content": text}
+                  ]
+                }));
         if (response.statusCode == 200) {
           var json = jsonDecode(response.body);
           setState(() {
@@ -86,27 +87,27 @@ class _ChatScreenState extends State<ChatScreen> {
                       padding: const EdgeInsets.symmetric(vertical: 4),
                       child: isTyping && index == 0
                           ? Column(
-                        children: [
-                          BubbleNormal(
-                            text: msgs[0].msg,
-                            isSender: true,
-                            color: Colors.blue.shade100,
-                          ),
-                          const Padding(
-                            padding: EdgeInsets.only(left: 16, top: 4),
-                            child: Align(
-                                alignment: Alignment.centerLeft,
-                                child: Text("Typing...")),
-                          )
-                        ],
-                      )
+                              children: [
+                                BubbleNormal(
+                                  text: msgs[0].msg,
+                                  isSender: true,
+                                  color: Colors.blue.shade100,
+                                ),
+                                const Padding(
+                                  padding: EdgeInsets.only(left: 16, top: 4),
+                                  child: Align(
+                                      alignment: Alignment.centerLeft,
+                                      child: Text("Typing...")),
+                                )
+                              ],
+                            )
                           : BubbleNormal(
-                        text: msgs[index].msg,
-                        isSender: msgs[index].isSender,
-                        color: msgs[index].isSender
-                            ? Colors.blue.shade100
-                            : Colors.grey.shade200,
-                      ));
+                              text: msgs[index].msg,
+                              isSender: msgs[index].isSender,
+                              color: msgs[index].isSender
+                                  ? Colors.blue.shade100
+                                  : Colors.grey.shade200,
+                            ));
                 }),
           ),
           Row(
