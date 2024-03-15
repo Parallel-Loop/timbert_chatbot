@@ -1,6 +1,6 @@
 import 'dart:convert';
 import 'package:chat_bubbles/bubbles/bubble_normal.dart';
-import 'package:chatgptbot/screens/message.dart';
+import 'package:chatgptbot/models/message.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 
