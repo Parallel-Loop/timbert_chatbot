@@ -3,6 +3,7 @@ import 'package:chat_bubbles/bubbles/bubble_normal.dart';
 // import 'package:chatgptbot/bloc/chat_bloc/chat_bloc.dart';
 import 'package:chatgptbot/models/message.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 // import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:http/http.dart' as http;
 import 'package:jumping_dot/jumping_dot.dart';
@@ -39,8 +40,8 @@ class _ChatScreenState extends State<ChatScreen2> {
 
   void sendMsg() async {
     String text = controller.text;
-    String apiKey = "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";
-    String modelId = "asst_jXrPxt2fN814U0COtE786jNo";
+    String? apiKey = dotenv.env['apiKey'];
+    String? modelId = dotenv.env['modelId'];
     controller.clear();
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String? threadId = prefs.getString('thread_id');

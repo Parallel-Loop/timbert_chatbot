@@ -1,11 +1,13 @@
 import 'package:chatgptbot/screens/chat_screen_2.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 // import 'package:flutter_bloc/flutter_bloc.dart';
 // import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 // import 'package:chatgptbot/bloc/chat_bloc/chat_bloc.dart';
 // import 'package:chatgptbot/screens/chat_screen.dart';
 
 void main() async {
+  await dotenv.load(fileName: ".env");
   runApp(const MyApp());
 }
 
