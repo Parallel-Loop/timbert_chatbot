@@ -1,13 +1,15 @@
-import 'package:chatgptbot/screens/chat_screen_2.dart';
+import 'package:chatgptbot/screens/chat_screen.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'firebase_options.dart';
 // import 'package:flutter_bloc/flutter_bloc.dart';
 // import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 // import 'package:chatgptbot/bloc/chat_bloc/chat_bloc.dart';
 // import 'package:chatgptbot/screens/chat_screen.dart';
 
 void main() async {
-  await dotenv.load(fileName: ".env");
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
   runApp(const MyApp());
 }
 
@@ -27,6 +29,7 @@ class MyApp extends StatelessWidget {
     return const MaterialApp(
       title: 'Chat GPT Bot',
       debugShowCheckedModeBanner: false,
+
       // localizationsDelegates: const [
       //   AppLocalizations.delegate,
       //   GlobalMaterialLocalizations.delegate,
@@ -36,7 +39,7 @@ class MyApp extends StatelessWidget {
       // supportedLocales: AppLocalizations.supportedLocales,
       // locale: state is ChatLanguageLoadedState ? state.locale : const Locale("en"),
       // localizationsDelegates: AppLocalizations.localizationsDelegates,
-      home: ChatScreen2(),
+      home: ChatScreen(),
     );
     //     },
     //   ),

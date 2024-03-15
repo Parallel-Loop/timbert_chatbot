@@ -25,8 +25,10 @@ class _ChatScreen3State extends State<ChatScreen3> {
     String text = controller.text;
     String? apiKey = dotenv.env['apiKey'];
     String? modelId = dotenv.env['modelId'];
+
     String? threadId = "";
     String runId = "";
+    String messageId = "";
     controller.clear();
     SharedPreferences prefs = await SharedPreferences.getInstance();
     threadId = prefs.getString('thread_id');
@@ -40,13 +42,14 @@ class _ChatScreen3State extends State<ChatScreen3> {
             duration: const Duration(seconds: 1), curve: Curves.easeOut);
 
         final openAI = OpenAI.instance.build(
-          // token: token,
+            token: apiKey,
             baseOption: HttpSetup(
-                receiveTimeout: const Duration(seconds: 5)
+              receiveTimeout: const Duration(seconds: 20),
             ),
             enableLog: true
         );
 
+        await Future.delayed(const Duration(seconds: 2));
         ///Create Thread
         await openAI.threads.createThread(request: ThreadRequest()).then((value) async {
           print(value.id);
@@ -54,6 +57,7 @@ class _ChatScreen3State extends State<ChatScreen3> {
           await prefs.setString('thread_id', threadId!);
         });
 
+        await Future.delayed(const Duration(seconds: 2));
         ///Add Message to thread
         final messageRequest = CreateMessage(
           role: 'user',
@@ -62,8 +66,11 @@ class _ChatScreen3State extends State<ChatScreen3> {
         await openAI.threads.messages.createMessage(
           threadId: threadId!,
           request: messageRequest,
-        );
+        ).then((value) {
+          messageId = value.id;
+        });
 
+        await Future.delayed(const Duration(seconds: 2));
         ///Run the Assistant
         final runAssistantRequest = CreateRun(assistantId: modelId!);
         await openAI.threads.runs.createRun(
@@ -73,18 +80,22 @@ class _ChatScreen3State extends State<ChatScreen3> {
           runId = value.id;
         });
 
+        await Future.delayed(const Duration(seconds: 2));
         ///Check Run Assistant
         await openAI.threads.runs.retrieveRun(
             threadId: threadId!,
             runId: runId
         );
 
+        await Future.delayed(const Duration(seconds: 2));
         ///Display the Assistant Response
         final assistantMessage = await openAI.threads.messages.retrieveMessage(
           threadId: threadId!,
-          messageId: '',
+          messageId: messageId,
         );
 
+        await Future.delayed(const Duration(seconds: 2));
+        print("Message: ${assistantMessage.content[0].text!.value}");
         setState(() {
           isTyping = false;
           msgs.insert(
@@ -98,13 +109,14 @@ class _ChatScreen3State extends State<ChatScreen3> {
         scrollController.animateTo(0.0,
             duration: const Duration(seconds: 1), curve: Curves.easeOut);
       }
-    } on Exception {
+    } on Exception catch (e) {
       setState(() {
         isTyping = false;
       });
       ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text("!אירעה שגיאה"),
+          SnackBar(
+            // content: Text("!אירעה שגיאה"),
+            content: Text("Error: ${e.toString()}"),
           )
       );
     }
