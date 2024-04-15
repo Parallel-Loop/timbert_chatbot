@@ -5,7 +5,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 class ModifyResponsePopup extends StatefulWidget {
 
   final String question, response;
-  final VoidCallback onSave;
+  final ValueChanged<String> onSave;
   const ModifyResponsePopup({super.key, required this.question, required this.response, required this.onSave});
 
   @override
@@ -17,7 +17,6 @@ class _ModifyResponsePopupState extends State<ModifyResponsePopup> {
   final TextEditingController _questionController = TextEditingController();
   final TextEditingController _answerController = TextEditingController();
   late String actualResponse;
-  bool consecutiveNewlines = false;
 
   @override
   void initState() {
@@ -56,33 +55,20 @@ class _ModifyResponsePopupState extends State<ModifyResponsePopup> {
               child: TextField(
                 controller: _answerController,
                 onChanged: (value) {
-                  _answerController.text = value;
-
                   // Handle newline behavior:
                   if (value.startsWith('\n')) {
                     // Prevent new line at the start
-                    value = value.substring(1);
-                    _answerController.text = value;
-                    _answerController.selection = TextSelection.fromPosition(
-                      TextPosition(offset: value.length),
+                    _answerController.value = TextEditingValue(
+                      text: value.substring(1),
+                      selection: const TextSelection.collapsed(offset: 0),
                     );
                   }
                   else if (value.endsWith('\n\n\n')) {
-                    consecutiveNewlines = true;
-                    if (consecutiveNewlines) {
-                      // Prevent moving to the next line for the third and subsequent newlines
-                      value = value.substring(0, value.length - 1);
-                      _answerController.text = value;
-                      _answerController.selection = TextSelection.fromPosition(
-                        TextPosition(offset: value.length),
-                      );
-                    }
-                    else {
-                      consecutiveNewlines = false; // Reset counter after two newlines
-                    }
-                  }
-                  else {
-                    consecutiveNewlines = false; // Reset counter if not a newline
+                    // Prevent moving to the next line for the third and subsequent newlines
+                    _answerController.value = TextEditingValue(
+                      text: value.substring(0, value.length - 2),
+                      selection: TextSelection.collapsed(offset: value.length - 2),
+                    );
                   }
                 },
                 decoration: const InputDecoration(
@@ -106,8 +92,6 @@ class _ModifyResponsePopupState extends State<ModifyResponsePopup> {
         TextButton(
           onPressed: () {
             saveResponseToFirestore(_questionController.text , _answerController.text);
-            // widget.onSave();
-            // Navigator.of(context).pop();
           },
           style: TextButton.styleFrom(
             foregroundColor: Colors.lightBlue,
@@ -148,7 +132,7 @@ class _ModifyResponsePopupState extends State<ModifyResponsePopup> {
           'timestamp': FieldValue.serverTimestamp(),
         }).then((_) {
           print('Data appended to Firestore');
-          widget.onSave();
+          widget.onSave(modifiedAnswer);
           Navigator.of(context).pop();
         }).catchError((error) {
           print('Error appending data: $error');
@@ -168,7 +152,7 @@ class _ModifyResponsePopupState extends State<ModifyResponsePopup> {
             'timestamp': FieldValue.serverTimestamp(),
           });
           print('Document created in Firestore with initial response');
-          widget.onSave();
+          widget.onSave(modifiedAnswer);
           Navigator.of(context).pop();
         }).catchError((error) {
           print('Error creating document: $error');

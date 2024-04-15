@@ -1,5 +1,6 @@
 class Message {
   bool isSender;
   String msg;
-  Message(this.isSender, this.msg);
+  bool isThumbsUpClicked;
+  Message(this.isSender, this.msg, {this.isThumbsUpClicked = false});
 }

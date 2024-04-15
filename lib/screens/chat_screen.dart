@@ -20,11 +20,20 @@ class _ChatScreenState extends State<ChatScreen> {
   TextEditingController controller = TextEditingController();
   ScrollController scrollController = ScrollController();
   List<Message> msgs = [];
+  List<bool> isThumbsUpClickedList = [];
   bool isTyping = false;
-  bool isThumbsUpClicked = false;
-  bool isResponseRecorded = false;
+  // bool isThumbsUpClicked = false;
+  // bool isResponseRecorded = false;
   String text = '';
   FocusNode nodeOne = FocusNode();
+
+  @override
+  void initState() {
+    super.initState();
+    if (msgs.isNotEmpty) {
+      isThumbsUpClickedList = List.generate(msgs.length, (index) => msgs[index].isThumbsUpClicked);
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -73,6 +82,9 @@ class _ChatScreenState extends State<ChatScreen> {
                   shrinkWrap: true,
                   reverse: true,
                   itemBuilder: (context, index) {
+                    if (isThumbsUpClickedList.length <= index) {
+                      isThumbsUpClickedList.add(false);
+                    }
                     final message = msgs[index];
                     return Padding(
                       padding: const EdgeInsets.symmetric(vertical: 4),
@@ -107,15 +119,15 @@ class _ChatScreenState extends State<ChatScreen> {
                               maxWidth: MediaQuery.of(context).size.width * 0.3,
                             ),
                           ),
-                          if (!message.isSender && index == 0)
+                          if (!message.isSender/* && index == 0*/)
                             Padding(
                               padding: const EdgeInsets.only(left: 16, top: 5),
-                              child: isResponseRecorded
+                              child: /*isResponseRecorded
                                   ? const Text(
                                 "התגובה שלך מוקלטת",
                                 style: TextStyle(fontSize: 12, fontWeight: FontWeight.w200),
                               )
-                                  : Column(
+                                  : */Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   const Text(
@@ -127,13 +139,36 @@ class _ChatScreenState extends State<ChatScreen> {
                                       IconButton(
                                         tooltip: "תגובה טובה",
                                         iconSize: 16,
-                                        icon: isThumbsUpClicked ? const Icon(Icons.thumb_up) : const Icon(Icons.thumb_up_alt_outlined),
+                                        icon: message.isThumbsUpClicked/*isThumbsUpClicked*/ ? const Icon(Icons.thumb_up) : const Icon(Icons.thumb_up_alt_outlined),
                                         color: Colors.black,
-                                        onPressed: () {
+                                        onPressed: () async {
                                           setState(() {
-                                            isThumbsUpClicked = true;
+                                            message.isThumbsUpClicked = !message.isThumbsUpClicked;
+                                            // isThumbsUpClicked = true;
                                           });
-                                          saveResponseToFirestore(text, msgs[index].msg);
+                                          // Determine the question and answer based on whether the message is from the sender or not
+                                          String question = msgs[index+1].msg;
+                                          String answer = message.isSender ? text : message.msg;
+
+                                          if (message.isThumbsUpClicked) {
+                                            await saveResponseToFirestore(question, answer);
+                                          }
+                                          else {
+                                            // Remove the thumbs-up reaction from Firestore
+                                            SharedPreferences prefs = await SharedPreferences.getInstance();
+                                            String? threadId = prefs.getString('thread_id');
+                                            await FirebaseFirestore.instance.collection('responses')
+                                                .doc(threadId)
+                                                .collection('thumbs_up_responses')
+                                                .where('question', isEqualTo: question)
+                                                .where('answer', isEqualTo: answer)
+                                                .get().then((querySnapshot) {
+                                                for (var doc in querySnapshot.docs) {
+                                                  doc.reference.delete(); // Delete the document
+                                                }
+                                              });
+                                            }
+                                          // saveResponseToFirestore(text, msgs[index].msg);
                                         },
                                       ),
                                       IconButton(
@@ -146,11 +181,11 @@ class _ChatScreenState extends State<ChatScreen> {
                                             context: context,
                                             builder: (BuildContext context) {
                                               return ModifyResponsePopup(
-                                                question: text,
+                                                question: msgs[index+1].msg,
                                                 response: msgs[index].msg,
-                                                onSave: () {
+                                                onSave: (modifiedAnswer) {
                                                   setState(() {
-                                                    isResponseRecorded = true;
+                                                    msgs[index].msg = modifiedAnswer;
                                                   });
                                                 },
                                               );
@@ -165,7 +200,6 @@ class _ChatScreenState extends State<ChatScreen> {
                             ),
                         ],
                       ),
-
                     );
                   },
                 ),
@@ -176,8 +210,8 @@ class _ChatScreenState extends State<ChatScreen> {
                 GestureDetector(
                   onTap: () {
                     setState(() {
-                      isThumbsUpClicked = false;
-                      isResponseRecorded = false;
+                      // isThumbsUpClicked = false;
+                      // isResponseRecorded = false;
                     });
                     if (isTyping == false) {
                       sendMsg();
@@ -215,16 +249,16 @@ class _ChatScreenState extends State<ChatScreen> {
                         padding: const EdgeInsets.symmetric(horizontal: 8),
                         child: TextField(
                           controller: controller,
-                          enabled: true,
+                          enabled: !isTyping,
                           autofocus: true,
                           focusNode: nodeOne,
                           cursorColor: Colors.lightBlue,
                           textCapitalization: TextCapitalization.sentences,
                           textAlign: TextAlign.right,
                           onSubmitted: (value) {
-                            sendMsg();
+                            !isTyping ? sendMsg() : null;
                           },
-                          textInputAction: TextInputAction.send,
+                          textInputAction: isTyping? TextInputAction.none : TextInputAction.send,
                           decoration: const InputDecoration(
                             border: InputBorder.none,
                             hintText: "הזן טקסט",
@@ -277,8 +311,8 @@ class _ChatScreenState extends State<ChatScreen> {
                   msgs.insert(
                     0,
                     Message(
-                        false,
-                        message.text.value
+                      false,
+                      message.text.value
                     ),
                   );
                 });
@@ -288,9 +322,9 @@ class _ChatScreenState extends State<ChatScreen> {
             }
             else {
               ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
-                    content: Text("aקרתה תקלה נסה שוב"),
-                  )
+                const SnackBar(
+                  content: Text("aקרתה תקלה נסה שוב"),
+                )
               );
               setState(() {
                 isTyping = false;
@@ -376,9 +410,9 @@ class _ChatScreenState extends State<ChatScreen> {
           'timestamp': FieldValue.serverTimestamp(),
         }).then((_) {
           print('Data appended to Firestore');
-          setState(() {
-            isResponseRecorded = true;
-          });
+          // setState(() {
+          //   isResponseRecorded = true;
+          // });
         }).catchError((error) {
           print('Error appending data: $error');
         });
@@ -396,9 +430,9 @@ class _ChatScreenState extends State<ChatScreen> {
             'timestamp': FieldValue.serverTimestamp(),
           });
           print('Document created in Firestore with initial response');
-          setState(() {
-            isResponseRecorded = true;
-          });
+          // setState(() {
+          //   isResponseRecorded = true;
+          // });
         }).catchError((error) {
           print('Error creating document: $error');
         });
@@ -409,4 +443,5 @@ class _ChatScreenState extends State<ChatScreen> {
     }
     FocusScope.of(context).requestFocus(nodeOne);
   }
+
 }

@@ -1,6 +1,8 @@
+import 'package:chatgptbot/screens/Dashboard/dashboard.dart';
 import 'package:chatgptbot/screens/chat_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:universal_html/html.dart';
 import 'firebase_options.dart';
 // import 'package:flutter_bloc/flutter_bloc.dart';
 // import 'package:flutter_gen/gen_l10n/app_localizations.dart';
@@ -10,11 +12,16 @@ import 'firebase_options.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
-  runApp(const MyApp());
+
+  String? initialRoute = window.location.pathname;
+
+  runApp(MyApp(initialRoute: initialRoute!));
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+  final String initialRoute;
+
+  const MyApp({super.key, required this.initialRoute});
 
   @override
   Widget build(BuildContext context) {
@@ -26,9 +33,25 @@ class MyApp extends StatelessWidget {
     // ],
     // child: BlocBuilder<ChatBloc, ChatState>(
     //   builder: (context, state) {
-    return const MaterialApp(
+    return MaterialApp(
       title: 'Chat GPT Bot',
       debugShowCheckedModeBanner: false,
+      routes: {
+        '/': (context) => const ChatScreen(),
+        '/dashboard': (context) => const DashboardScreen(),
+      },
+      // Handle unknown routes
+      onGenerateRoute: (settings) {
+        return MaterialPageRoute(
+          builder: (context) => Scaffold(
+            appBar: AppBar(),
+            body: const Center(
+              child: Text('404 - Page not found')
+            ),
+          ),
+        );
+      },
+      initialRoute: initialRoute,
 
       // localizationsDelegates: const [
       //   AppLocalizations.delegate,
@@ -39,7 +62,10 @@ class MyApp extends StatelessWidget {
       // supportedLocales: AppLocalizations.supportedLocales,
       // locale: state is ChatLanguageLoadedState ? state.locale : const Locale("en"),
       // localizationsDelegates: AppLocalizations.localizationsDelegates,
-      home: ChatScreen(),
+      // home: ChatScreen(),
+      theme: ThemeData(
+        colorSchemeSeed: Colors.blue
+      ),
     );
     //     },
     //   ),
