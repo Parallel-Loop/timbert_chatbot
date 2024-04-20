@@ -2,8 +2,9 @@ import 'package:chatgptbot/screens/Dashboard/dashboard.dart';
 import 'package:chatgptbot/screens/chat_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
-import 'package:universal_html/html.dart';
+import 'package:universal_html/html.dart' as html;
 import 'firebase_options.dart';
+import 'package:url_strategy/url_strategy.dart';
 // import 'package:flutter_bloc/flutter_bloc.dart';
 // import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 // import 'package:chatgptbot/bloc/chat_bloc/chat_bloc.dart';
@@ -13,8 +14,8 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
 
-  String? initialRoute = window.location.pathname;
-
+  String? initialRoute = html.window.location.pathname;
+  setPathUrlStrategy();
   runApp(MyApp(initialRoute: initialRoute!));
 }
 
@@ -52,7 +53,6 @@ class MyApp extends StatelessWidget {
         );
       },
       initialRoute: initialRoute,
-
       // localizationsDelegates: const [
       //   AppLocalizations.delegate,
       //   GlobalMaterialLocalizations.delegate,

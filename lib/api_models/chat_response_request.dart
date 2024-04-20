@@ -31,19 +31,23 @@ class ResponseData {
   ResponseData({
     required this.type,
     required this.text,
+    this.error
   });
   late final String type;
   late final ResponseValue text;
+  late final String? error;
 
   ResponseData.fromJson(Map<String, dynamic> json){
     type = json['type'];
     text = ResponseValue.fromJson(json['text']);
+    error = json['error'];
   }
 
   Map<String, dynamic> toJson() {
     final _data = <String, dynamic>{};
     _data['type'] = type;
     _data['text'] = text.toJson();
+    _data['error'] = error;
     return _data;
   }
 }

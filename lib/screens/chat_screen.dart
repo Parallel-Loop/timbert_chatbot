@@ -26,6 +26,7 @@ class _ChatScreenState extends State<ChatScreen> {
   // bool isResponseRecorded = false;
   String text = '';
   FocusNode nodeOne = FocusNode();
+  String? response;
 
   @override
   void initState() {
@@ -39,6 +40,8 @@ class _ChatScreenState extends State<ChatScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        backgroundColor: const Color(0xffE9EFF7),
+        surfaceTintColor: Colors.transparent,
         centerTitle: true,
         title: const Text("ברט בוט"),
         actions: [
@@ -90,116 +93,118 @@ class _ChatScreenState extends State<ChatScreen> {
                       padding: const EdgeInsets.symmetric(vertical: 4),
                       child: isTyping && index == 0
                           ? Column(
-                        children: [
-                          BubbleNormal(
-                            text: msgs[0].msg,
-                            isSender: true,
-                            color: Colors.blue.shade100,
-                            constraints: BoxConstraints(
-                              maxWidth: MediaQuery.of(context).size.width * 0.3,
-                            ),
-                          ),
-                          Padding(
-                            padding: EdgeInsets.only(right: MediaQuery.of(context).size.width * 0.28),
-                            child: JumpingDots(
-                              color: Colors.lightBlue,
-                            ),
-                          ),
-                        ],
-                      )
-                          : Column(
-                        children: [
-                          BubbleNormal(
-                            text: msgs[index].msg,
-                            isSender: msgs[index].isSender,
-                            color: msgs[index].isSender
-                                ? Colors.blue.shade100
-                                : Colors.grey.shade200,
-                            constraints: BoxConstraints(
-                              maxWidth: MediaQuery.of(context).size.width * 0.3,
-                            ),
-                          ),
-                          if (!message.isSender/* && index == 0*/)
-                            Padding(
-                              padding: const EdgeInsets.only(left: 16, top: 5),
-                              child: /*isResponseRecorded
-                                  ? const Text(
-                                "התגובה שלך מוקלטת",
-                                style: TextStyle(fontSize: 12, fontWeight: FontWeight.w200),
-                              )
-                                  : */Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  const Text(
-                                    "האם התגובה הזו עזרה?",
-                                    style: TextStyle(fontSize: 12, fontWeight: FontWeight.w200),
+                              children: [
+                                BubbleNormal(
+                                  text: msgs[0].msg,
+                                  isSender: true,
+                                  color: Colors.blue.shade100,
+                                  constraints: BoxConstraints(
+                                    maxWidth: MediaQuery.of(context).size.width * 0.3,
                                   ),
-                                  Row(
+                                ),
+                                Padding(
+                                  padding: EdgeInsets.only(right: MediaQuery.of(context).size.width * 0.28),
+                                  child: JumpingDots(
+                                    color: Colors.lightBlue,
+                                  ),
+                                ),
+                              ],
+                            )
+                          : Column(
+                              children: [
+                                BubbleNormal(
+                                  text: msgs[index].msg,
+                                  isSender: msgs[index].isSender,
+                                  color: msgs[index].isSender
+                                      ? Colors.blue.shade100
+                                      : Colors.grey.shade200,
+                                  constraints: BoxConstraints(
+                                    maxWidth: MediaQuery.of(context).size.width * 0.3,
+                                  ),
+                                ),
+                                if (!message.isSender/* && index == 0*/)
+                                Padding(
+                                  padding: const EdgeInsets.only(left: 16, top: 5),
+                                  child: /*isResponseRecorded
+                                      ? const Text(
+                                    "התגובה שלך מוקלטת",
+                                    style: TextStyle(fontSize: 12, fontWeight: FontWeight.w200),
+                                  )
+                                      : */Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
                                     children: [
-                                      IconButton(
-                                        tooltip: "תגובה טובה",
-                                        iconSize: 16,
-                                        icon: message.isThumbsUpClicked/*isThumbsUpClicked*/ ? const Icon(Icons.thumb_up) : const Icon(Icons.thumb_up_alt_outlined),
-                                        color: Colors.black,
-                                        onPressed: () async {
-                                          setState(() {
-                                            message.isThumbsUpClicked = !message.isThumbsUpClicked;
-                                            // isThumbsUpClicked = true;
-                                          });
-                                          // Determine the question and answer based on whether the message is from the sender or not
-                                          String question = msgs[index+1].msg;
-                                          String answer = message.isSender ? text : message.msg;
-
-                                          if (message.isThumbsUpClicked) {
-                                            await saveResponseToFirestore(question, answer);
-                                          }
-                                          else {
-                                            // Remove the thumbs-up reaction from Firestore
-                                            SharedPreferences prefs = await SharedPreferences.getInstance();
-                                            String? threadId = prefs.getString('thread_id');
-                                            await FirebaseFirestore.instance.collection('responses')
-                                                .doc(threadId)
-                                                .collection('thumbs_up_responses')
-                                                .where('question', isEqualTo: question)
-                                                .where('answer', isEqualTo: answer)
-                                                .get().then((querySnapshot) {
-                                                for (var doc in querySnapshot.docs) {
-                                                  doc.reference.delete(); // Delete the document
-                                                }
-                                              });
-                                            }
-                                          // saveResponseToFirestore(text, msgs[index].msg);
-                                        },
+                                      const Text(
+                                        "האם התגובה הזו עזרה?",
+                                        style: TextStyle(fontSize: 12, fontWeight: FontWeight.w200),
                                       ),
-                                      IconButton(
-                                        tooltip: "שנה תגובה",
-                                        iconSize: 16,
-                                        icon: const Icon(Icons.tune),
-                                        color: Colors.black,
-                                        onPressed: () {
-                                          showDialog(
-                                            context: context,
-                                            builder: (BuildContext context) {
-                                              return ModifyResponsePopup(
-                                                question: msgs[index+1].msg,
-                                                response: msgs[index].msg,
-                                                onSave: (modifiedAnswer) {
-                                                  setState(() {
-                                                    msgs[index].msg = modifiedAnswer;
+                                      Row(
+                                        children: [
+                                          IconButton(
+                                            tooltip: "תגובה טובה",
+                                            iconSize: 16,
+                                            icon: message.isThumbsUpClicked/*isThumbsUpClicked*/ ? const Icon(Icons.thumb_up) : const Icon(Icons.thumb_up_alt_outlined),
+                                            color: Colors.black,
+                                            onPressed: () async {
+                                              setState(() {
+                                                message.isThumbsUpClicked = !message.isThumbsUpClicked;
+                                                // isThumbsUpClicked = true;
+                                              });
+                                              // Determine the question and answer based on whether the message is from the sender or not
+                                              String question = msgs[index+1].msg;
+                                              // String answer = message.isSender ? text : message.msg;
+                                              String answer = response!;
+
+                                              if (message.isThumbsUpClicked) {
+                                                await saveResponseToFirestore(question, answer);
+                                              }
+                                              else {
+                                                // Remove the thumbs-up reaction from Firestore
+                                                SharedPreferences prefs = await SharedPreferences.getInstance();
+                                                String? threadId = prefs.getString('thread_id');
+                                                await FirebaseFirestore.instance.collection('responses')
+                                                    .doc(threadId)
+                                                    .collection('thumbs_up_responses')
+                                                    .where('question', isEqualTo: question)
+                                                    .where('answer', isEqualTo: answer)
+                                                    .get().then((querySnapshot) {
+                                                    for (var doc in querySnapshot.docs) {
+                                                      doc.reference.delete(); // Delete the document
+                                                    }
                                                   });
+                                                }
+                                              // saveResponseToFirestore(text, msgs[index].msg);
+                                            },
+                                          ),
+                                          IconButton(
+                                            tooltip: "שנה תגובה",
+                                            iconSize: 16,
+                                            icon: const Icon(Icons.tune),
+                                            color: Colors.black,
+                                            onPressed: () {
+                                              showDialog(
+                                                context: context,
+                                                builder: (BuildContext context) {
+                                                  return ModifyResponsePopup(
+                                                    question: msgs[index+1].msg,
+                                                    // response: msgs[index].msg,
+                                                    response: response!,
+                                                    onSave: (modifiedAnswer) {
+                                                      setState(() {
+                                                        msgs[index].msg = modifiedAnswer;
+                                                      });
+                                                    },
+                                                  );
                                                 },
                                               );
                                             },
-                                          );
-                                        },
+                                          ),
+                                        ],
                                       ),
                                     ],
                                   ),
-                                ],
-                              ),
+                                ),
+                              ],
                             ),
-                        ],
-                      ),
                     );
                   },
                 ),
@@ -288,8 +293,7 @@ class _ChatScreenState extends State<ChatScreen> {
           msgs.insert(0, Message(true, text));
           isTyping = true;
         });
-        scrollController.animateTo(0.0,
-            duration: const Duration(seconds: 1), curve: Curves.easeOut
+        scrollController.animateTo(0.0, duration: const Duration(seconds: 1), curve: Curves.easeOut
         );
         if (threadId == null) {
           await requestCreateThread().then((value) async {
@@ -302,23 +306,57 @@ class _ChatScreenState extends State<ChatScreen> {
         }
 
         if (threadId != null) {
-          requestChat(threadId!, text).then((value) {
+          requestChat(threadId!, text).then((value) async {
             if (value != null && value.status == true && value.code == 1) {
+              print('if.......');
               // var message = value.data[0].text.value;
               for(var message in value.data) {
                 setState(() {
                   isTyping = false;
+                  // Remove square brackets and content within them from the message text
+                  response = message.text.value.replaceAll(RegExp(r'\[.*?\]|\【.*?】'), '');
                   msgs.insert(
                     0,
                     Message(
                       false,
-                      message.text.value
+                      response!,
+                      // message.text.value
                     ),
                   );
                 });
                 scrollController.animateTo(0.0, duration: const Duration(seconds: 1), curve: Curves.easeOut);
-                saveMessagesToFirestore(text, message.text.value);
+                saveMessagesToFirestore(text, response!/*, message.text.value*/);
               }
+            }
+            else if(value != null && value.status == false && (value.message.contains("Operation failed to perform") || value.message.contains("Internet Error") || value.data.any((responseData) => responseData.error!.contains('No thread found')))) {
+              print('else if.......');
+              await requestCreateThread().then((value) async {
+                if(value != null && value.status == true && value.code == 1) {
+                  threadId = value.data.threadId;
+                  await prefs.setString('thread_id', threadId!);
+                  print("Thread Id: $threadId");
+                }
+              });
+              requestChat(threadId!, text).then((value) {
+                if (value != null && value.status == true && value.code == 1) {
+                  for(var message in value.data) {
+                    setState(() {
+                      isTyping = false;
+                      // Remove square brackets and content within them from the message text
+                      response = message.text.value.replaceAll(RegExp(r'\[.*?\]|\【.*?】'), '');
+                      msgs.insert(
+                        0,
+                        Message(
+                          false,
+                          response!,
+                        ),
+                      );
+                    });
+                    scrollController.animateTo(0.0, duration: const Duration(seconds: 1), curve: Curves.easeOut);
+                    saveMessagesToFirestore(text, response!);
+                  }
+                }
+              });
             }
             else {
               ScaffoldMessenger.of(context).showSnackBar(

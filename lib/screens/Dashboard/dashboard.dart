@@ -29,38 +29,40 @@ class _DashboardScreenState extends State<DashboardScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        backgroundColor: const Color(0xffE9EFF7),
+        surfaceTintColor: Colors.transparent,
         title: const Text('לוח המחוונים של ברט בוט'),
-        actions: [
-          Padding(
-            padding: const EdgeInsets.only(right: 20),
-            child: ExportDataButton(
-              icon: Icons.download,
-              onPressed: () {
-                showMenu<String>(
-                  context: context,
-                  position: const RelativeRect.fromLTRB(10, 50, 0, 0),
-                  items: <PopupMenuEntry<String>>[
-                    const PopupMenuItem<String>(
-                      value: 'Export as Documents',
-                      child: Text('ייצא כמסמך'),
-                    ),
-                    const PopupMenuItem<String>(
-                      value: 'Export as PDF',
-                      child: Text('ייצוא כ-pdf'),
-                    ),
-                  ],
-                ).then((value) {
-                  if (value == 'Export as Documents') {
-                    // Handle export as documents
-                  }
-                  else if (value == 'Export as PDF') {
-                    // Handle export as PDF
-                  }
-                });
-              },
-            ),
-          ),
-        ],
+        // actions: [
+        //   Padding(
+        //     padding: const EdgeInsets.only(right: 20),
+        //     child: ExportDataButton(
+        //       icon: Icons.download,
+        //       onPressed: () {
+        //         showMenu<String>(
+        //           context: context,
+        //           position: const RelativeRect.fromLTRB(10, 50, 0, 0),
+        //           items: <PopupMenuEntry<String>>[
+        //             const PopupMenuItem<String>(
+        //               value: 'Export as Documents',
+        //               child: Text('ייצא כמסמך'),
+        //             ),
+        //             const PopupMenuItem<String>(
+        //               value: 'Export as PDF',
+        //               child: Text('ייצוא כ-pdf'),
+        //             ),
+        //           ],
+        //         ).then((value) {
+        //           if (value == 'Export as Documents') {
+        //             // Handle export as documents
+        //           }
+        //           else if (value == 'Export as PDF') {
+        //             // Handle export as PDF
+        //           }
+        //         });
+        //       },
+        //     ),
+        //   ),
+        // ],
       ),
       drawer: DashboardDrawer(
         // Pass selected option to DashboardDrawer
@@ -72,9 +74,15 @@ class _DashboardScreenState extends State<DashboardScreen> {
           });
         },
       ),
-      body: Center(
-        // Display data based on selected option
-        child: _buildSelectedScreen(),
+      body: Padding(
+        padding: EdgeInsets.symmetric(horizontal: MediaQuery.of(context).size.width * 0.05, vertical: 10),
+        child: Directionality(
+          textDirection: TextDirection.rtl,
+          child: Center(
+            // Display data based on selected option
+            child: _buildSelectedScreen(),
+          ),
+        ),
       ),
     );
   }
