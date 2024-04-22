@@ -39,7 +39,7 @@ Future<CreateThreadRequest?> requestCreateThread() async {
   return result;
 }
 
-//----------------------------------- Login -----------------------------------
+//----------------------------------- Query -----------------------------------
 Future<ChatResponse?> requestChat(String threadId, String message) async {
 
   ChatResponse? result;
