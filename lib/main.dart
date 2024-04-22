@@ -1,18 +1,74 @@
+import 'package:chatgptbot/screens/Dashboard/dashboard.dart';
 import 'package:chatgptbot/screens/chat_screen.dart';
 import 'package:flutter/material.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'package:universal_html/html.dart' as html;
+import 'firebase_options.dart';
+import 'package:url_strategy/url_strategy.dart';
+// import 'package:flutter_bloc/flutter_bloc.dart';
+// import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+// import 'package:chatgptbot/bloc/chat_bloc/chat_bloc.dart';
+// import 'package:chatgptbot/screens/chat_screen.dart';
 
 void main() async {
-  runApp(const MyApp());
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+
+  String? initialRoute = html.window.location.pathname;
+  setPathUrlStrategy();
+  runApp(MyApp(initialRoute: initialRoute!));
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+  final String initialRoute;
+
+  const MyApp({super.key, required this.initialRoute});
 
   @override
   Widget build(BuildContext context) {
-    return const MaterialApp(
-      home: ChatScreen(),
+    // return MultiBlocProvider(
+    // providers: [
+    //   BlocProvider<ChatBloc>(
+    //     create: (context) => ChatBloc(),
+    //   ),
+    // ],
+    // child: BlocBuilder<ChatBloc, ChatState>(
+    //   builder: (context, state) {
+    return MaterialApp(
+      title: 'Chat GPT Bot',
       debugShowCheckedModeBanner: false,
+      routes: {
+        '/': (context) => const ChatScreen(),
+        '/dashboard': (context) => const DashboardScreen(),
+      },
+      // Handle unknown routes
+      onGenerateRoute: (settings) {
+        return MaterialPageRoute(
+          builder: (context) => Scaffold(
+            appBar: AppBar(),
+            body: const Center(
+              child: Text('404 - Page not found')
+            ),
+          ),
+        );
+      },
+      initialRoute: initialRoute,
+      // localizationsDelegates: const [
+      //   AppLocalizations.delegate,
+      //   GlobalMaterialLocalizations.delegate,
+      //   GlobalWidgetsLocalizations.delegate,
+      //   GlobalCupertinoLocalizations.delegate,
+      // ],
+      // supportedLocales: AppLocalizations.supportedLocales,
+      // locale: state is ChatLanguageLoadedState ? state.locale : const Locale("en"),
+      // localizationsDelegates: AppLocalizations.localizationsDelegates,
+      // home: ChatScreen(),
+      theme: ThemeData(
+        colorSchemeSeed: Colors.blue
+      ),
     );
+    //     },
+    //   ),
+    // );
   }
 }
