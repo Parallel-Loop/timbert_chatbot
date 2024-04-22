@@ -194,7 +194,6 @@ class EditResponseTab extends StatelessWidget {
                           },
                         ),
                         Row(
-                          // mainAxisAlignment: MainAxisAlignment.end,
                           children: [
                             Container(
                               padding: const EdgeInsets.all(8),
@@ -207,15 +206,15 @@ class EditResponseTab extends StatelessWidget {
                                   Text(
                                     "$formattedTimeZone ",
                                     style: const TextStyle(
-                                        fontSize: 12,
-                                        fontWeight: FontWeight.bold
+                                      fontSize: 12,
+                                      fontWeight: FontWeight.bold
                                     ),
                                   ),
                                   Text(
                                     formattedTime,
                                     style: const TextStyle(
-                                        fontSize: 12,
-                                        fontWeight: FontWeight.bold
+                                      fontSize: 12,
+                                      fontWeight: FontWeight.bold
                                     ),
                                   ),
                                 ],
