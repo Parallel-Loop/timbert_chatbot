@@ -126,13 +126,6 @@ class AllMessagesTab extends StatelessWidget {
             messageWidgets.add(
               Container(
                 padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
-                // decoration: BoxDecoration(
-                //   border: Border(
-                //     bottom: BorderSide(
-                //       color: Colors.grey.shade300,
-                //     ),
-                //   ),
-                // ),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -184,7 +177,6 @@ class AllMessagesTab extends StatelessWidget {
                           },
                         ),
                         Row(
-                          // mainAxisAlignment: MainAxisAlignment.end,
                           children: [
                             Container(
                               padding: const EdgeInsets.all(8),
@@ -204,8 +196,8 @@ class AllMessagesTab extends StatelessWidget {
                                   Text(
                                     formattedTime,
                                     style: const TextStyle(
-                                        fontSize: 12,
-                                        fontWeight: FontWeight.bold
+                                      fontSize: 12,
+                                      fontWeight: FontWeight.bold
                                     ),
                                   ),
                                 ],
@@ -428,44 +420,6 @@ Future<void> exportToExcel(List<Map<String, dynamic>> data) async {
     html.Url.revokeObjectUrl(url);
   }
 }
-
-// Future<void> exportToWordDocument(List<Map<String, dynamic>> data) async {
-//   // Prepare data as HTML
-//   String documentContent = '<html><head><style>'
-//       'p { text-align: left; }'
-//       '.date { text-align: center; font-weight: bold; }'
-//       '.question { text-align: right; }'
-//       '.answer { text-align: right; }'
-//       '.time { text-align: left; font-weight: bold; }'
-//       '</style></head><body dir="rtl">';
-//
-//   for (var message in data) {
-//     final timestamp = message['timestamp'].toDate();
-//     documentContent += '<p class="date">${DateFormat.yMMMMd('en_US').format(timestamp)}</p>'
-//         '<p class="question">${message['question']}</p>'
-//         '<p class="answer">${message['answer']}</p>'
-//         '<p class="time">${DateFormat("h:mm a").format(timestamp)}</p><br>';
-//   }
-//
-//   documentContent += '</body></html>';
-//
-//   // Convert document content to bytes
-//   List<int> documentBytes = utf8.encode(documentContent);
-//
-//   // Create blob from bytes
-//   final blob = html.Blob([documentBytes], 'text/html');
-//
-//   // Create object URL
-//   final url = html.Url.createObjectUrlFromBlob(blob);
-//
-//   // Create anchor element
-//   final anchor = html.AnchorElement(href: url)
-//     ..setAttribute('download', 'All_Messages.docx')
-//     ..click();
-//
-//   // Revoke the object URL to free up memory
-//   html.Url.revokeObjectUrl(url);
-// }
 
 Future<void> exportToWordDocument(List<Map<String, dynamic>> data) async {
   // Prepare data as HTML
