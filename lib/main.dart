@@ -5,10 +5,6 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:universal_html/html.dart' as html;
 import 'firebase_options.dart';
 import 'package:url_strategy/url_strategy.dart';
-// import 'package:flutter_bloc/flutter_bloc.dart';
-// import 'package:flutter_gen/gen_l10n/app_localizations.dart';
-// import 'package:chatgptbot/bloc/chat_bloc/chat_bloc.dart';
-// import 'package:chatgptbot/screens/chat_screen.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -26,14 +22,6 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // return MultiBlocProvider(
-    // providers: [
-    //   BlocProvider<ChatBloc>(
-    //     create: (context) => ChatBloc(),
-    //   ),
-    // ],
-    // child: BlocBuilder<ChatBloc, ChatState>(
-    //   builder: (context, state) {
     return MaterialApp(
       title: 'Chat GPT Bot',
       debugShowCheckedModeBanner: false,
@@ -53,22 +41,9 @@ class MyApp extends StatelessWidget {
         );
       },
       initialRoute: initialRoute,
-      // localizationsDelegates: const [
-      //   AppLocalizations.delegate,
-      //   GlobalMaterialLocalizations.delegate,
-      //   GlobalWidgetsLocalizations.delegate,
-      //   GlobalCupertinoLocalizations.delegate,
-      // ],
-      // supportedLocales: AppLocalizations.supportedLocales,
-      // locale: state is ChatLanguageLoadedState ? state.locale : const Locale("en"),
-      // localizationsDelegates: AppLocalizations.localizationsDelegates,
-      // home: ChatScreen(),
       theme: ThemeData(
         colorSchemeSeed: Colors.blue
       ),
     );
-    //     },
-    //   ),
-    // );
   }
 }
