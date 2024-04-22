@@ -421,13 +421,13 @@ Future<void> exportToExcel(List<Map<String, dynamic>> data) async {
 
 Future<void> exportToWordDocument(List<Map<String, dynamic>> data) async {
   // Prepare data as HTML
-  String documentContent = '<html><head><style>'
+  String documentContent = '<html><head><meta charset="utf-8"><style>'
       'p { text-align: left; }'
       '.date { text-align: center; font-weight: bold; }'
       '.question { text-align: right; }'
       '.answer { text-align: right; }'
       '.time { text-align: left; font-weight: bold; }'
-      '</style></head><body dir="rtl">';
+      '</style></head><body>';
 
   for (var message in data) {
     final timestamp = message['timestamp'].toDate();
@@ -442,17 +442,19 @@ Future<void> exportToWordDocument(List<Map<String, dynamic>> data) async {
   // Convert document content to bytes
   List<int> documentBytes = utf8.encode(documentContent);
 
-  // Create blob from bytes
-  final blob = html.Blob([documentBytes], 'text/html');
+  // Create data URI for the Word document
+  final dataUri = 'data:application/vnd.openxmlformats-officedocument.wordprocessingml.document;base64,${base64Encode(documentBytes)}';
 
-  // Create object URL
-  final url = html.Url.createObjectUrlFromBlob(blob);
+  // Create a temporary anchor element
+  final anchor = html.AnchorElement(href: dataUri)
+    ..setAttribute('download', 'New_Pair.doc');
 
-  // Create anchor element
-  final anchor = html.AnchorElement(href: url)
-    ..setAttribute('download', 'New_Pair.docx')
-    ..click();
+  // Append the anchor element to the document body
+  html.document.body?.append(anchor);
 
-  // Revoke the object URL to free up memory
-  html.Url.revokeObjectUrl(url);
+  // Simulate a click on the anchor to trigger the download
+  anchor.click();
+
+  // Remove the anchor from the document body
+  anchor.remove();
 }
