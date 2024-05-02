@@ -30,9 +30,6 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  #  flutter_localizations:
-  #    sdk: flutter
-  #  intl: any
 
 
   # The following adds the Cupertino Icons font to your application.
@@ -64,9 +61,6 @@ dependencies:
 
   universal_html: ^2.2.4      # Universal HTML for web support
   url_strategy: ^0.2.0        # URL Strategy for web navigation
-
-#  bloc: ^8.1.3                #State Management
-#  flutter_bloc: ^8.1.4        #Implement the BLoC Design Pattern (Business Logic Component)
 
 dev_dependencies:
   flutter_test:

@@ -17,13 +17,12 @@ class ChatScreen extends StatefulWidget {
 }
 
 class _ChatScreenState extends State<ChatScreen> {
+
   TextEditingController controller = TextEditingController();
   ScrollController scrollController = ScrollController();
   List<Message> msgs = [];
   List<bool> isThumbsUpClickedList = [];
   bool isTyping = false;
-  // bool isThumbsUpClicked = false;
-  // bool isResponseRecorded = false;
   String text = '';
   FocusNode nodeOne = FocusNode();
   String? response;
@@ -122,15 +121,10 @@ class _ChatScreenState extends State<ChatScreen> {
                                     maxWidth: MediaQuery.of(context).size.width * 0.3,
                                   ),
                                 ),
-                                if (!message.isSender/* && index == 0*/)
+                                if (!message.isSender)
                                 Padding(
                                   padding: const EdgeInsets.only(left: 16, top: 5),
-                                  child: /*isResponseRecorded
-                                      ? const Text(
-                                    "התגובה שלך מוקלטת",
-                                    style: TextStyle(fontSize: 12, fontWeight: FontWeight.w200),
-                                  )
-                                      : */Column(
+                                  child: Column(
                                     crossAxisAlignment: CrossAxisAlignment.start,
                                     children: [
                                       const Text(
@@ -142,16 +136,14 @@ class _ChatScreenState extends State<ChatScreen> {
                                           IconButton(
                                             tooltip: "תגובה טובה",
                                             iconSize: 16,
-                                            icon: message.isThumbsUpClicked/*isThumbsUpClicked*/ ? const Icon(Icons.thumb_up) : const Icon(Icons.thumb_up_alt_outlined),
+                                            icon: message.isThumbsUpClicked ? const Icon(Icons.thumb_up) : const Icon(Icons.thumb_up_alt_outlined),
                                             color: Colors.black,
                                             onPressed: () async {
                                               setState(() {
                                                 message.isThumbsUpClicked = !message.isThumbsUpClicked;
-                                                // isThumbsUpClicked = true;
                                               });
                                               // Determine the question and answer based on whether the message is from the sender or not
                                               String question = msgs[index+1].msg;
-                                              // String answer = message.isSender ? text : message.msg;
                                               String answer = response!;
 
                                               if (message.isThumbsUpClicked) {
@@ -171,8 +163,7 @@ class _ChatScreenState extends State<ChatScreen> {
                                                       doc.reference.delete(); // Delete the document
                                                     }
                                                   });
-                                                }
-                                              // saveResponseToFirestore(text, msgs[index].msg);
+                                              }
                                             },
                                           ),
                                           IconButton(
@@ -186,7 +177,6 @@ class _ChatScreenState extends State<ChatScreen> {
                                                 builder: (BuildContext context) {
                                                   return ModifyResponsePopup(
                                                     question: msgs[index+1].msg,
-                                                    // response: msgs[index].msg,
                                                     response: response!,
                                                     onSave: (modifiedAnswer) {
                                                       setState(() {
@@ -214,10 +204,7 @@ class _ChatScreenState extends State<ChatScreen> {
               children: [
                 GestureDetector(
                   onTap: () {
-                    setState(() {
-                      // isThumbsUpClicked = false;
-                      // isResponseRecorded = false;
-                    });
+                    setState(() {});
                     if (isTyping == false) {
                       sendMsg();
                     }
@@ -226,8 +213,8 @@ class _ChatScreenState extends State<ChatScreen> {
                     height: 40,
                     width: 40,
                     decoration: BoxDecoration(
-                        color: !isTyping ? Colors.lightBlue : Colors.grey,
-                        borderRadius: BorderRadius.circular(30)
+                      color: !isTyping ? Colors.lightBlue : Colors.grey,
+                      borderRadius: BorderRadius.circular(30)
                     ),
                     child: Transform(
                       alignment: Alignment.center,
@@ -247,8 +234,8 @@ class _ChatScreenState extends State<ChatScreen> {
                       width: double.infinity,
                       height: 50,
                       decoration: BoxDecoration(
-                          color: Colors.grey[200],
-                          borderRadius: BorderRadius.circular(10)
+                        color: Colors.grey[200],
+                        borderRadius: BorderRadius.circular(10)
                       ),
                       child: Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 8),
@@ -308,8 +295,7 @@ class _ChatScreenState extends State<ChatScreen> {
         if (threadId != null) {
           requestChat(threadId!, text).then((value) async {
             if (value != null && value.status == true && value.code == 1) {
-              print('if.......');
-              // var message = value.data[0].text.value;
+
               for(var message in value.data) {
                 setState(() {
                   isTyping = false;
@@ -320,7 +306,6 @@ class _ChatScreenState extends State<ChatScreen> {
                     Message(
                       false,
                       response!,
-                      // message.text.value
                     ),
                   );
                 });
@@ -329,7 +314,7 @@ class _ChatScreenState extends State<ChatScreen> {
               }
             }
             else if(value != null && value.status == false && (value.message.contains("Operation failed to perform") || value.message.contains("Internet Error") || value.data.any((responseData) => responseData.error!.contains('No thread found')))) {
-              print('else if.......');
+
               await requestCreateThread().then((value) async {
                 if(value != null && value.status == true && value.code == 1) {
                   threadId = value.data.threadId;
@@ -448,9 +433,6 @@ class _ChatScreenState extends State<ChatScreen> {
           'timestamp': FieldValue.serverTimestamp(),
         }).then((_) {
           print('Data appended to Firestore');
-          // setState(() {
-          //   isResponseRecorded = true;
-          // });
         }).catchError((error) {
           print('Error appending data: $error');
         });
@@ -468,9 +450,6 @@ class _ChatScreenState extends State<ChatScreen> {
             'timestamp': FieldValue.serverTimestamp(),
           });
           print('Document created in Firestore with initial response');
-          // setState(() {
-          //   isResponseRecorded = true;
-          // });
         }).catchError((error) {
           print('Error creating document: $error');
         });
@@ -481,5 +460,4 @@ class _ChatScreenState extends State<ChatScreen> {
     }
     FocusScope.of(context).requestFocus(nodeOne);
   }
-
 }
